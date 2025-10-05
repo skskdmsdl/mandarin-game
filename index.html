@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <!-- SEO 메타태그 -->
+    <meta
+      name="description"
+      content="만다린 숫자 합계 10 게임 - 재미있는 두뇌 게임"
+    />
+    <meta name="keywords" content="만다린, 게임, 숫자, 두뇌게임, 퍼즐" />
+
+    <!-- Open Graph 메타태그 -->
+    <meta property="og:title" content="만다린 10 게임" />
+    <meta
+      property="og:description"
+      content="만다린을 선택해서 합이 10이 되도록 하세요!"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://username.github.io/mandarin-game"
+    />
+
+    <title>만다린 10 게임</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🍊 만다린 10 게임</h1>
+      </div>
+
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-value" id="score">0</div>
+          <div class="stat-label">현재 점수</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="bestScore">0</div>
+          <div class="stat-label">최고 점수</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="timeLeft">90</div>
+          <div class="stat-label">남은 시간</div>
+        </div>
+      </div>
+
+      <div class="time-bar">
+        <div class="time-progress" id="timeProgress"></div>
+      </div>
+
+      <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="message" id="message"></div>
+        <div class="start-message" id="startMessage">
+          🎮 게임 시작 버튼을 눌러 시작하세요!
+          <br /><br />
+          <small>게임이 시작되면 숫자가 보입니다</small>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="restartBtn">게임 시작</button>
+        <button id="shareBtn" class="share-btn">공유하기</button>
+      </div>
+
+      <div class="instructions">
+        <h3>🎯 게임 방법</h3>
+        <p>• 드래그하여 만다린을 선택하세요</p>
+        <p>• 선택한 만다린 숫자의 합이 <strong>정확히 10</strong>이면 성공!</p>
+        <p>• 성공시 만다린이 사라지고 점수를 얻습니다</p>
+        <p>• 90초 동안 최대한 많은 점수를 얻어보세요!</p>
+      </div>
+    </div>
+
+    <script src="js/game.js"></script>
+  </body>
+</html>
