@@ -27,7 +27,7 @@ function init() {
   ctx = canvas.getContext("2d");
 
   // 이미지 미리 로드
-  mandarinImage.src = "images/mandarin.png";
+  mandarinImage.src = "images/mandarin4.png";
   mandarinImage.onload = function () {
     console.log("만다린 이미지 로드 완료");
   };
@@ -360,7 +360,7 @@ function drawMandarin(m) {
   // 숫자 그리기
   if (showNumbers) {
     ctx.fillStyle = "white";
-    ctx.font = `bold ${m.size * 0.7}px Arial`;
+    ctx.font = `bold ${m.size * 1.2}px sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -371,7 +371,7 @@ function drawMandarin(m) {
     ctx.shadowOffsetY = 1;
 
     // 숫자 위치를 약간 위로 조정하여 중앙에 오도록 함
-    ctx.fillText(m.value, m.x + 2, m.y + 2);
+    ctx.fillText(m.value, m.x, m.y + 6);
 
     // 그림자 초기화
     ctx.shadowColor = "transparent";
