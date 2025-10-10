@@ -51,9 +51,15 @@ function init() {
 // 캔버스 크기 조정
 function resizeCanvas() {
   const container = canvas.parentElement;
-  const size = Math.min(container.clientWidth, container.clientHeight);
-  canvas.width = container.clientWidth;
+  // 부모 컨테이너의 너비를 기준으로 정사각형 크기 설정
+  const size = container.clientWidth;
+  canvas.width = size;
   canvas.height = size;
+
+  // 캔버스 크기가 변경되면 만다린 다시 생성
+  if (mandarins.length > 0) {
+    createMandarins();
+  }
 }
 
 // 만다린 생성 (10x10 그리드)
@@ -62,7 +68,8 @@ function createMandarins() {
   const rows = 10;
   const cols = 10;
 
-  const size = 20;
+  // 캔버스 크기에 따라 동적으로 크기 조정
+  const size = Math.max(15, canvas.width / 15); // 최소 크기 보장
 
   const cellWidth = canvas.width / cols;
   const cellHeight = canvas.height / rows;
@@ -80,9 +87,14 @@ function createMandarins() {
         size,
         collected: false,
         originalSize: size,
+        row,
+        col,
       });
     }
   }
+  console.log(
+    `만다린 생성 완료: ${mandarins.length}개, 캔버스 크기: ${canvas.width}x${canvas.height}`
+  );
 }
 
 // 이벤트 리스너
@@ -294,17 +306,50 @@ async function buildScoreImageBlob({
 
   return await new Promise((r) => canvas.toBlob(r, "image/png", 0.92));
 }
+// 카카오톡 공유를 위한 메타태그 동적 생성 함수 추가
+function updateKakaoShareMeta(score, bestScore) {
+  // 기존 메타태그 제거
+  const existingMeta = document.querySelector(
+    'meta[property="og:title"], meta[property="og:description"]'
+  );
+  if (existingMeta) {
+    existingMeta.remove();
+  }
 
-// 공유하기
+  // 동적 메타태그 생성
+  const titleMeta = document.createElement("meta");
+  titleMeta.setAttribute("property", "og:title");
+  titleMeta.content = `만다린 10 게임 - ${score}점 달성!`;
+  document.head.appendChild(titleMeta);
+
+  const descMeta = document.createElement("meta");
+  descMeta.setAttribute("property", "og:description");
+  descMeta.content = `최고 점수: ${bestScore}점! 만다린을 선택해서 합이 10이 되도록 하세요!`;
+  document.head.appendChild(descMeta);
+
+  // 이미지 URL이 절대 경로인지 확인
+  const imageMeta = document.querySelector('meta[property="og:image"]');
+  if (imageMeta) {
+    let imageUrl = imageMeta.getAttribute("content");
+    if (!imageUrl.startsWith("http")) {
+      // 상대 경로를 절대 경로로 변환
+      imageMeta.setAttribute("content", SITE_URL + imageUrl.replace(/^\//, ""));
+    }
+  }
+}
+
+// 공유하기 함수 수정 - 카카오톡 지원 추가
 async function shareScore() {
   const sc = score ?? 0;
   const bs = bestScore ?? 0;
   const text = `🍊 만다린 10 게임에서 ${sc}점! (최고 ${bs}점)`;
 
-  // 클릭 이벤트 안에서 바로 실행해야 share sheet가 뜸!
+  // 카카오톡 공유 메타데이터 업데이트
+  updateKakaoShareMeta(sc, bs);
+
+  // Web Share API 사용
   if (navigator.share) {
     try {
-      // 1) 이미지 파일 만들어 보기
       let files = [];
       try {
         const blob = await buildScoreImageBlob({
@@ -312,30 +357,40 @@ async function shareScore() {
           best: bs,
           bgUrl: "/images/og.jpg",
         });
-        const file = new File([blob], `mandarin_${bs}.png`, {
+        const file = new File([blob], `mandarin_${sc}.png`, {
           type: "image/png",
         });
-        if (navigator.canShare?.({ files: [file] })) files = [file];
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          files = [file];
+        }
       } catch (e) {
-        // 이미지 생성 실패 시 파일 없이 진행
+        console.log("이미지 생성 실패:", e);
       }
 
-      // 2) 파일 공유를 지원하면 파일+텍스트+URL, 아니면 텍스트+URL만
       await navigator.share({
         title: "만다린 10 게임",
-        text,
+        text: text,
         url: SITE_URL,
-        ...(files.length ? { files } : {}),
+        ...(files.length > 0 ? { files: files } : {}),
       });
       return;
     } catch (e) {
-      // 사용자가 취소한 경우 등은 무시
-      return;
+      if (e.name !== "AbortError") {
+        console.log("공유 실패:", e);
+      }
     }
   }
 
-  // 여기까지 오면 그 브라우저는 share sheet가 없음
-  alert("이 브라우저는 기본 공유 시트를 지원하지 않아요.");
+  // Web Share API를 지원하지 않는 경우
+  try {
+    // 클립보드에 복사
+    await navigator.clipboard.writeText(`${text} ${SITE_URL}`);
+    alert("점수가 클립보드에 복사되었습니다! 메시지에 붙여넣기 하세요.");
+  } catch (e) {
+    // 클립보드 실패 시 기본 공유
+    const shareUrl = `${SITE_URL}?score=${sc}&best=${bs}`;
+    prompt("다음 URL을 복사해서 공유하세요:", shareUrl);
+  }
 }
 
 // 메시지 표시
