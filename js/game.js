@@ -21,7 +21,7 @@ const startMessage = document.getElementById("startMessage");
 const restartBtn = document.getElementById("restartBtn");
 const shareBtn = document.getElementById("shareBtn");
 
-const SITE_URL = "https://www.mandarin10.store/"; // 실제 주소
+const SITE_URL = 'https://www.mandarin10.store/'; // 실제 주소
 
 // --- Cloudinary 썸네일 설정 ---
 const CLOUD_NAME = "dd9nbrnnc";
@@ -274,42 +274,24 @@ function restartGame() {
 }
 
 // 공유하기
+// 기존 shareScore()를 이걸로 교체
 function shareScore() {
-  const text = `🍊 만다린 10 게임에서 ${window.score ?? 0}점! (최고 ${
-    window.bestScore ?? 0
-  }점)`;
-
-  if (navigator.share) {
-    // 모바일/데스크톱 대부분 브라우저에서 공유 시트가 뜸
-    navigator
-      .share({
-        title: "만다린 10 게임",
-        text, // 텍스트에 URL 중복 넣지 않음
-        url: SITE_URL, // URL은 한 번만
-      })
-      .catch(() => {
-        /* 사용자가 취소한 경우 무시 */
-      });
-  } else if (navigator.clipboard) {
-    // 폴백: 텍스트+URL 복사
-    navigator.clipboard
-      .writeText(`${text}\n${SITE_URL}`)
-      .then(() => showMessage("공유 문구를 복사했어요!"));
-  } else {
-    // 최후 폴백: 선택 영역 생성
-    const payload = `${text}\n${SITE_URL}`;
-    const ta = document.createElement("textarea");
-    ta.value = payload;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    ta.remove();
-    showMessage("공유 문구를 복사했어요!");
-  }
+  // 메뉴(카카오/X) 열기
+  openShareMenu();
 }
 
-// 버튼 연결(이미 클릭 리스너가 있으면 생략)
-document.getElementById("shareBtn")?.addEventListener("click", shareScore);
+// 카카오가 없거나 메뉴를 못 쓰는 환경일 때 사용할 폴백
+function shareViaWebShare() {
+  const url = buildShareUrl(window.score, window.bestScore);
+  const text = `🍊 만다린 10 게임에서 ${window.score ?? 0}점을 달성! (최고 ${window.bestScore ?? 0}점)`;
+  if (navigator.share) {
+    navigator.share({ title: '만다린 10 게임', text, url });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(`${text}\n\n${url}`).then(() => showMessage('링크를 복사했어요!'));
+  } else {
+    showMessage('공유 기능을 사용할 수 없습니다');
+  }
+}
 
 // 메시지 표시
 function showMessage(text, isGameOver = false) {
