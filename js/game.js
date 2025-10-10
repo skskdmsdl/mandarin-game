@@ -21,22 +21,8 @@ const startMessage = document.getElementById("startMessage");
 const restartBtn = document.getElementById("restartBtn");
 const shareBtn = document.getElementById("shareBtn");
 
-const SITE_URL = 'https://www.mandarin10.store/'; // 실제 주소
-
-// --- Cloudinary 썸네일 설정 ---
-const CLOUD_NAME = "dd9nbrnnc";
-const PUBLIC_ID = "mandarin_og";
-
-function buildScoreImage(bestScore) {
-  const text = encodeURIComponent(`최고 ${bestScore}점`);
-  return (
-    `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/` +
-    `w_1200,h_630,c_fill/` +
-    `l_text:Arial_120_bold:${text},co_rgb:ffffff,` +
-    `g_center,y_40/` +
-    `${PUBLIC_ID}.png`
-  );
-}
+// 사이트 URL (공유용)
+const SITE_URL = "https://www.mandarin10.store/";
 
 // 게임 초기화
 function init() {
@@ -273,23 +259,100 @@ function restartGame() {
   updateTimeBar();
 }
 
-// 공유하기
-// 기존 shareScore()를 이걸로 교체
-function shareScore() {
-  // 메뉴(카카오/X) 열기
-  openShareMenu();
+// 동적 이미지 생성: 배경 위에 텍스트(점수) 그려서 PNG Blob 반환
+async function buildScoreImageBlob({
+  score = 0,
+  best = 0,
+  bgUrl = "/images/og.jpg",
+}) {
+  const img = await new Promise((res, rej) => {
+    const i = new Image();
+    i.crossOrigin = "anonymous"; // 같은 도메인이라면 없어도 됨
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = bgUrl;
+  });
+
+  const W = 1200,
+    H = 630; // 공유용 권장 비율
+  const canvas = Object.assign(document.createElement("canvas"), {
+    width: W,
+    height: H,
+  });
+  const ctx = canvas.getContext("2d");
+
+  // 배경
+  ctx.drawImage(img, 0, 0, W, H);
+
+  // 반투명 바 탑재(가독성)
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.fillRect(0, H - 200, W, 200);
+
+  // 텍스트
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.font =
+    "bold 72px system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, sans-serif";
+  ctx.fillText(`이번 점수 ${score}점`, W / 2, H - 120);
+  ctx.font =
+    "bold 60px system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, sans-serif";
+  ctx.fillText(`최고 ${best}점`, W / 2, H - 50);
+
+  return await new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/png", 0.92)
+  );
 }
 
-// 카카오가 없거나 메뉴를 못 쓰는 환경일 때 사용할 폴백
-function shareViaWebShare() {
-  const url = buildShareUrl(window.score, window.bestScore);
-  const text = `🍊 만다린 10 게임에서 ${window.score ?? 0}점을 달성! (최고 ${window.bestScore ?? 0}점)`;
-  if (navigator.share) {
-    navigator.share({ title: '만다린 10 게임', text, url });
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(`${text}\n\n${url}`).then(() => showMessage('링크를 복사했어요!'));
-  } else {
-    showMessage('공유 기능을 사용할 수 없습니다');
+// 공유하기
+async function shareScore() {
+  const sc = window.score ?? 0;
+  const bs = window.bestScore ?? 0;
+  const text = `🍊 만다린 10 게임에서 ${sc}점! (최고 ${bs}점)`;
+
+  try {
+    // 동적 이미지 생성
+    const blob = await buildScoreImageBlob({
+      score: sc,
+      best: bs,
+      bgUrl: "/images/og.jpg",
+    });
+    const file = new File([blob], `mandarin_${bs}.png`, { type: "image/png" });
+
+    // Web Share API(파일 공유 지원 브라우저에서 이미지 + 텍스트 + URL 공유)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        title: "만다린 10 게임",
+        text,
+        url: SITE_URL, // URL은 한 번만
+        files: [file],
+      });
+      return;
+    }
+
+    // 파일 공유 미지원 → 클립보드에 "이미지" 복사 시도(지원 브라우저 한정)
+    if (navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
+      // 텍스트도 함께 복사하고 싶으면 다음 줄 추가:
+      // await navigator.clipboard.writeText(`${text}\n${SITE_URL}`);
+      showMessage("이미지를 클립보드에 복사했어요!");
+      return;
+    }
+
+    // 최후 폴백: 텍스트+링크만 복사
+    await navigator.clipboard?.writeText?.(`${text}\n${SITE_URL}`);
+    showMessage("공유 문구를 복사했어요!");
+  } catch (e) {
+    // 에러 시 텍스트만 공유 폴백
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "만다린 10 게임", text, url: SITE_URL });
+      } else {
+        await navigator.clipboard?.writeText?.(`${text}\n${SITE_URL}`);
+        showMessage("공유 문구를 복사했어요!");
+      }
+    } catch {}
   }
 }
 
