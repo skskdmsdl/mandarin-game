@@ -265,42 +265,35 @@ async function buildScoreImageBlob({
   best = 0,
   bgUrl = "/images/og.jpg",
 }) {
-  const img = await new Promise((res, rej) => {
-    const i = new Image();
-    i.crossOrigin = "anonymous"; // 같은 도메인이라면 없어도 됨
-    i.onload = () => res(i);
-    i.onerror = rej;
-    i.src = bgUrl;
+  const i = await new Promise((res, rej) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = bgUrl;
   });
 
   const W = 1200,
-    H = 630; // 공유용 권장 비율
+    H = 630;
   const canvas = Object.assign(document.createElement("canvas"), {
     width: W,
     height: H,
   });
   const ctx = canvas.getContext("2d");
 
-  // 배경
-  ctx.drawImage(img, 0, 0, W, H);
-
-  // 반투명 바 탑재(가독성)
-  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.drawImage(i, 0, 0, W, H); // 배경
+  ctx.fillStyle = "rgba(0,0,0,0.35)"; // 하단 반투명 바
   ctx.fillRect(0, H - 200, W, 200);
-
-  // 텍스트
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "#fff"; // 텍스트
   ctx.textAlign = "center";
   ctx.font =
-    "bold 72px system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, sans-serif";
+    "bold 72px system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,sans-serif";
   ctx.fillText(`이번 점수 ${score}점`, W / 2, H - 120);
   ctx.font =
-    "bold 60px system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, sans-serif";
+    "bold 60px system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,sans-serif";
   ctx.fillText(`최고 ${best}점`, W / 2, H - 50);
 
-  return await new Promise((resolve) =>
-    canvas.toBlob(resolve, "image/png", 0.92)
-  );
+  return await new Promise((r) => canvas.toBlob(r, "image/png", 0.92));
 }
 
 // 공유하기
@@ -309,51 +302,41 @@ async function shareScore() {
   const bs = window.bestScore ?? 0;
   const text = `🍊 만다린 10 게임에서 ${sc}점! (최고 ${bs}점)`;
 
-  try {
-    // 동적 이미지 생성
-    const blob = await buildScoreImageBlob({
-      score: sc,
-      best: bs,
-      bgUrl: "/images/og.jpg",
-    });
-    const file = new File([blob], `mandarin_${bs}.png`, { type: "image/png" });
+  // 클릭 이벤트 안에서 바로 실행해야 share sheet가 뜸!
+  if (navigator.share) {
+    try {
+      // 1) 이미지 파일 만들어 보기
+      let files = [];
+      try {
+        const blob = await buildScoreImageBlob({
+          score: sc,
+          best: bs,
+          bgUrl: "/images/og.jpg",
+        });
+        const file = new File([blob], `mandarin_${bs}.png`, {
+          type: "image/png",
+        });
+        if (navigator.canShare?.({ files: [file] })) files = [file];
+      } catch (e) {
+        // 이미지 생성 실패 시 파일 없이 진행
+      }
 
-    // Web Share API(파일 공유 지원 브라우저에서 이미지 + 텍스트 + URL 공유)
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      // 2) 파일 공유를 지원하면 파일+텍스트+URL, 아니면 텍스트+URL만
       await navigator.share({
         title: "만다린 10 게임",
         text,
-        url: SITE_URL, // URL은 한 번만
-        files: [file],
+        url: SITE_URL,
+        ...(files.length ? { files } : {}),
       });
       return;
-    }
-
-    // 파일 공유 미지원 → 클립보드에 "이미지" 복사 시도(지원 브라우저 한정)
-    if (navigator.clipboard && window.ClipboardItem) {
-      await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": blob }),
-      ]);
-      // 텍스트도 함께 복사하고 싶으면 다음 줄 추가:
-      // await navigator.clipboard.writeText(`${text}\n${SITE_URL}`);
-      showMessage("이미지를 클립보드에 복사했어요!");
+    } catch (e) {
+      // 사용자가 취소한 경우 등은 무시
       return;
     }
-
-    // 최후 폴백: 텍스트+링크만 복사
-    await navigator.clipboard?.writeText?.(`${text}\n${SITE_URL}`);
-    showMessage("공유 문구를 복사했어요!");
-  } catch (e) {
-    // 에러 시 텍스트만 공유 폴백
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: "만다린 10 게임", text, url: SITE_URL });
-      } else {
-        await navigator.clipboard?.writeText?.(`${text}\n${SITE_URL}`);
-        showMessage("공유 문구를 복사했어요!");
-      }
-    } catch {}
   }
+
+  // 여기까지 오면 그 브라우저는 share sheet가 없음
+  alert("이 브라우저는 기본 공유 시트를 지원하지 않아요.");
 }
 
 // 메시지 표시
