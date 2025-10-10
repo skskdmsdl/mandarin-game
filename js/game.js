@@ -69,13 +69,22 @@ function createMandarins() {
   const cols = 10;
 
   // 캔버스 크기에 따라 동적으로 크기 조정
-  const size = Math.max(15, canvas.width / 15); // 최소 크기 보장
+  const size = Math.max(10, canvas.width / 20); // 최소 크기 보장
 
+  const paddingRatio = 2;
   const cellWidth = canvas.width / cols;
   const cellHeight = canvas.height / rows;
 
+  const paddingX = (cellWidth * paddingRatio) / 2;
+  const paddingY = (cellHeight * paddingRatio) / 2;
+
+  console.log(
+    `캔버스: ${canvas.width}x${canvas.height}, 셀: ${cellWidth}x${cellHeight}, 여백: ${paddingX}x${paddingY}`
+  );
+
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
+      // 여백을 고려한 위치 계산
       const x = col * cellWidth + cellWidth / 2;
       const y = row * cellHeight + cellHeight / 2;
       const value = Math.floor(Math.random() * 9) + 1;
@@ -84,7 +93,7 @@ function createMandarins() {
         x,
         y,
         value,
-        size,
+        size, // 사이즈는 줄이고
         collected: false,
         originalSize: size,
         row,
@@ -92,9 +101,7 @@ function createMandarins() {
       });
     }
   }
-  console.log(
-    `만다린 생성 완료: ${mandarins.length}개, 캔버스 크기: ${canvas.width}x${canvas.height}`
-  );
+  console.log(`만다린 생성 완료: ${mandarins.length}개, 크기: ${size}px`);
 }
 
 // 이벤트 리스너
