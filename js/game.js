@@ -87,15 +87,14 @@ function createMandarins() {
 
 // 이벤트 리스너
 function setupEventListeners() {
-  // 캔버스 내에서 시작
+  // 마우스는 기존 유지
   canvas.addEventListener("mousedown", startDrawing);
-  canvas.addEventListener("touchstart", handleTouchStart);
-
-  // 문서 전체에서 이동 및 종료 이벤트 처리
   document.addEventListener("mousemove", drawRectangle);
   document.addEventListener("mouseup", stopDrawing);
 
-  document.addEventListener("touchmove", handleTouchMove);
+  // 터치는 canvas에만, passive:false
+  canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+  canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
   document.addEventListener("touchend", stopDrawing);
 
   restartBtn.addEventListener("click", startGame);
@@ -103,14 +102,14 @@ function setupEventListeners() {
 }
 
 function handleTouchStart(e) {
-  e.preventDefault();
   if (!gameStarted || !showNumbers) return;
+  e.preventDefault(); // 여기선 OK (캔버스 안 터치 시작)
   startDrawing(e.touches[0]);
 }
 
 function handleTouchMove(e) {
+  if (!isDrawing || !gameStarted || !showNumbers) return; // 드래그 중 아니면 스크롤 허용
   e.preventDefault();
-  if (!isDrawing || !gameStarted || !showNumbers) return;
   drawRectangle(e.touches[0]);
 }
 
