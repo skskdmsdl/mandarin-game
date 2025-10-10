@@ -277,126 +277,138 @@ function restartGame() {
   updateTimeBar();
 }
 
-// 동적 이미지 생성: 배경 위에 텍스트(점수) 그려서 PNG Blob 반환
-async function buildScoreImageBlob({
-  score = 0,
-  best = 0,
-  bgUrl = "/images/og.jpg",
-}) {
-  const i = await new Promise((res, rej) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => res(img);
-    img.onerror = rej;
-    img.src = bgUrl;
+// game.js에 추가 - 동적 OG 이미지 생성 함수
+function generateOgImage(score = 0, bestScore = 0) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 630;
+    const ctx = canvas.getContext("2d");
+
+    // 배경 그리기
+    ctx.fillStyle = "#FFA726";
+    ctx.fillRect(0, 0, 1200, 630);
+
+    // 제목
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "bold 72px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("🍊 만다린 10 게임", 600, 200);
+
+    // 점수
+    ctx.font = "bold 48px Arial";
+    ctx.fillText(`이번 점수: ${score}점`, 600, 320);
+    ctx.fillText(`최고 점수: ${bestScore}점`, 600, 400);
+
+    // URL
+    ctx.font = "24px Arial";
+    ctx.fillText("www.mandarin10.store", 600, 550);
+
+    canvas.toBlob(
+      (blob) => {
+        const url = URL.createObjectURL(blob);
+        resolve(url);
+      },
+      "image/jpeg",
+      0.9
+    );
   });
-
-  const W = 1200,
-    H = 630;
-  const canvas = Object.assign(document.createElement("canvas"), {
-    width: W,
-    height: H,
-  });
-  const ctx = canvas.getContext("2d");
-
-  ctx.drawImage(i, 0, 0, W, H); // 배경
-  ctx.fillStyle = "rgba(0,0,0,0.35)"; // 하단 반투명 바
-  ctx.fillRect(0, H - 200, W, 200);
-  ctx.fillStyle = "#fff"; // 텍스트
-  ctx.textAlign = "center";
-  ctx.font =
-    "bold 72px system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,sans-serif";
-  ctx.fillText(`이번 점수 ${score}점`, W / 2, H - 120);
-  ctx.font =
-    "bold 60px system-ui,-apple-system,Segoe UI,Roboto,Noto Sans KR,sans-serif";
-  ctx.fillText(`최고 ${best}점`, W / 2, H - 50);
-
-  return await new Promise((r) => canvas.toBlob(r, "image/png", 0.92));
 }
-// 카카오톡 공유를 위한 메타태그 동적 생성 함수 추가
-function updateKakaoShareMeta(score, bestScore) {
-  // 기존 메타태그 제거
-  const existingMeta = document.querySelector(
-    'meta[property="og:title"], meta[property="og:description"]'
-  );
-  if (existingMeta) {
-    existingMeta.remove();
-  }
 
-  // 동적 메타태그 생성
-  const titleMeta = document.createElement("meta");
-  titleMeta.setAttribute("property", "og:title");
-  titleMeta.content = `만다린 10 게임 - ${score}점 달성!`;
-  document.head.appendChild(titleMeta);
+// 공유 시 OG 이미지 업데이트
+async function updateOgImageForShare(score, bestScore) {
+  try {
+    const imageUrl = await generateOgImage(score, bestScore);
 
-  const descMeta = document.createElement("meta");
-  descMeta.setAttribute("property", "og:description");
-  descMeta.content = `최고 점수: ${bestScore}점! 만다린을 선택해서 합이 10이 되도록 하세요!`;
-  document.head.appendChild(descMeta);
-
-  // 이미지 URL이 절대 경로인지 확인
-  const imageMeta = document.querySelector('meta[property="og:image"]');
-  if (imageMeta) {
-    let imageUrl = imageMeta.getAttribute("content");
-    if (!imageUrl.startsWith("http")) {
-      // 상대 경로를 절대 경로로 변환
-      imageMeta.setAttribute("content", SITE_URL + imageUrl.replace(/^\//, ""));
+    // 기존 og:image 메타태그 제거
+    let ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage) {
+      ogImage.remove();
     }
+
+    // 새 메타태그 생성
+    ogImage = document.createElement("meta");
+    ogImage.setAttribute("property", "og:image");
+    ogImage.setAttribute("content", imageUrl);
+    document.head.appendChild(ogImage);
+
+    // Twitter 메타태그도 업데이트
+    let twitterImage = document.querySelector('meta[name="twitter:image"]');
+    if (twitterImage) {
+      twitterImage.setAttribute("content", imageUrl);
+    }
+
+    console.log("OG 이미지 업데이트 완료:", imageUrl);
+  } catch (error) {
+    console.error("OG 이미지 생성 실패:", error);
   }
 }
 
-// 공유하기 함수 수정 - 카카오톡 지원 추가
+// game.js - 공유 함수 전체 수정
 async function shareScore() {
   const sc = score ?? 0;
   const bs = bestScore ?? 0;
-  const text = `🍊 만다린 10 게임에서 ${sc}점! (최고 ${bs}점)`;
+  const shareText = `🍊 만다린 10 게임에서 ${sc}점을 달성했어요! (최고 ${bs}점)`;
+  const shareUrl = SITE_URL;
 
-  // 카카오톡 공유 메타데이터 업데이트
-  updateKakaoShareMeta(sc, bs);
+  try {
+    // OG 이미지 준비
+    await updateOgImageForShare(sc, bs);
 
-  // Web Share API 사용
-  if (navigator.share) {
-    try {
-      let files = [];
+    // Web Share API 시도
+    if (navigator.share) {
       try {
-        const blob = await buildScoreImageBlob({
-          score: sc,
-          best: bs,
-          bgUrl: "/images/og.jpg",
+        await navigator.share({
+          title: "만다린 10 게임",
+          text: shareText,
+          url: shareUrl,
         });
-        const file = new File([blob], `mandarin_${sc}.png`, {
-          type: "image/png",
-        });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          files = [file];
-        }
-      } catch (e) {
-        console.log("이미지 생성 실패:", e);
-      }
-
-      await navigator.share({
-        title: "만다린 10 게임",
-        text: text,
-        url: SITE_URL,
-        ...(files.length > 0 ? { files: files } : {}),
-      });
-      return;
-    } catch (e) {
-      if (e.name !== "AbortError") {
-        console.log("공유 실패:", e);
+        console.log("공유 성공");
+        return;
+      } catch (shareError) {
+        console.log("Web Share 실패:", shareError);
+        // Web Share 실패 시 카카오톡 공유 시도
       }
     }
-  }
 
-  // Web Share API를 지원하지 않는 경우
-  try {
-    // 클립보드에 복사
-    await navigator.clipboard.writeText(`${text} ${SITE_URL}`);
-    alert("점수가 클립보드에 복사되었습니다! 메시지에 붙여넣기 하세요.");
-  } catch (e) {
-    // 클립보드 실패 시 기본 공유
-    const shareUrl = `${SITE_URL}?score=${sc}&best=${bs}`;
-    prompt("다음 URL을 복사해서 공유하세요:", shareUrl);
+    // 🔥 카카오톡 공유 시도
+    if (typeof Kakao !== "undefined" && Kakao.isInitialized()) {
+      try {
+        Kakao.Share.sendDefault({
+          objectType: "feed",
+          content: {
+            title: "🍊 만다린 10 게임",
+            description: shareText,
+            imageUrl: "https://www.mandarin10.store/images/og-image.jpg",
+            link: {
+              mobileWebUrl: shareUrl,
+              webUrl: shareUrl,
+            },
+          },
+          buttons: [
+            {
+              title: "게임 하러가기",
+              link: {
+                mobileWebUrl: shareUrl,
+                webUrl: shareUrl,
+              },
+            },
+          ],
+        });
+        return;
+      } catch (kakaoError) {
+        console.log("카카오톡 공유 실패:", kakaoError);
+      }
+    }
+
+    // 🔥 폴백: 클립보드 복사
+    await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+    alert(
+      "📋 공유 내용이 클립보드에 복사되었습니다! 카카오톡이나 문자로 공유해보세요."
+    );
+  } catch (error) {
+    console.error("공유 실패:", error);
+    alert("공유에 실패했습니다. URL을 직접 복사해주세요: " + SITE_URL);
   }
 }
 
