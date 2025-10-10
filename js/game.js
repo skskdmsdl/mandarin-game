@@ -50,11 +50,17 @@ function init() {
 
 // 캔버스 크기 조정
 function resizeCanvas() {
-  const container = canvas.parentElement;
-  const size = Math.min(container.clientWidth, container.clientHeight);
-  canvas.width = container.clientWidth;
-  canvas.height = size;
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  // 렌더링 해상도만 조정
+  canvas.width  = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+
+  // 좌표계를 CSS 픽셀 기준으로 맞춤
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
+
 
 // 만다린 생성 (10x10 그리드)
 function createMandarins() {
