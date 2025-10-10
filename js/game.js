@@ -298,8 +298,8 @@ async function buildScoreImageBlob({
 
 // 공유하기
 async function shareScore() {
-  const sc = window.score ?? 0;
-  const bs = window.bestScore ?? 0;
+  const sc = score ?? 0;
+  const bs = bestScore ?? 0;
   const text = `🍊 만다린 10 게임에서 ${sc}점! (최고 ${bs}점)`;
 
   // 클릭 이벤트 안에서 바로 실행해야 share sheet가 뜸!
