@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    />
+
+    <meta
+      name="description"
+      content="만다린 숫자 합계 10 게임 - 재미있는 두뇌 게임"
+    />
+    <meta
+      name="keywords"
+      content="만다린, 게임, 숫자, 두뇌게임, 퍼즐, 사과, 사과게임"
+    />
+
+    <!-- SEO 메타태그 -->
+    <meta
+      name="description"
+      content="만다린 숫자 합계 10 게임 - 재미있는 두뇌 게임"
+    />
+    <meta
+      name="keywords"
+      content="만다린, 게임, 숫자, 두뇌게임, 퍼즐, 사과, 사과게임"
+    />
+
+    <!-- Google AdSense (Auto Ads) -->
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5192370055620596"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- AdSense 메타태그 -->
+    <meta name="google-adsense-account" content="ca-pub-5192370055620596" />
+
+    <!-- OG/Twitter -->
+    <meta
+      property="og:title"
+      content="{{ page.title | default: '만다린 10 게임' }}"
+    />
+    <meta
+      property="og:description"
+      content="만다린을 선택해서 합이 10이 되도록 하세요!"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ site.url }}{{ page.url }}" />
+    <meta property="og:image" content="{{ '/images/og.jpg' | absolute_url }}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="만다린 10 게임" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="{{ page.title | default: '만다린 10 게임' }}"
+    />
+    <meta
+      name="twitter:description"
+      content="만다린을 선택해서 합이 10이 되도록 하세요!"
+    />
+    <meta
+      name="twitter:image"
+      content="{{ '/images/og.jpg' | absolute_url }}"
+    />
+
+    <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}" />
+    <title>{{ page.title | default: '만다린 10 게임' }}</title>
+
+    <!-- (선택) Kakao env & SDK: 필요 시 주석 해제
+  <script src="{{ '/env.js' | relative_url }}"></script>
+  <script>
+    (function() {
+      const KEY = window.__ENV__?.KAKAO_JS_KEY;
+      if(!KEY) return;
+      const s = document.createElement('script');
+      s.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js';
+      s.crossOrigin = 'anonymous';
+      s.onload = () => Kakao.init(KEY);
+      document.head.appendChild(s);
+    })();
+  </script>
+  --></head>
+  <body>
+    <div class="container">
+      {% include header.html %}
+
+      <!-- 페이지 본문 -->
+      {{ content }} {% include footer.html %}
+    </div>
+
+    <!-- 페이지별 스크립트 -->
+    {% if page.scripts %} {% for s in page.scripts %}
+    <script src="{{ s | relative_url }}"></script>
+    {% endfor %} {% endif %}
+  </body>
+</html>

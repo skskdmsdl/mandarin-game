@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    />
+
+    <meta
+      name="description"
+      content="만다린 숫자 합계 10 게임 - 재미있는 두뇌 게임"
+    />
+    <meta
+      name="keywords"
+      content="만다린, 게임, 숫자, 두뇌게임, 퍼즐, 사과, 사과게임"
+    />
+
+    <!-- SEO 메타태그 -->
+    <meta
+      name="description"
+      content="만다린 숫자 합계 10 게임 - 재미있는 두뇌 게임"
+    />
+    <meta
+      name="keywords"
+      content="만다린, 게임, 숫자, 두뇌게임, 퍼즐, 사과, 사과게임"
+    />
+
+    <!-- Google AdSense (Auto Ads) -->
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5192370055620596"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- AdSense 메타태그 -->
+    <meta name="google-adsense-account" content="ca-pub-5192370055620596" />
+
+    <!-- OG/Twitter -->
+    <meta
+      property="og:title"
+      content="이용약관"
+    />
+    <meta
+      property="og:description"
+      content="만다린을 선택해서 합이 10이 되도록 하세요!"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://localhost:4000/terms/" />
+    <meta property="og:image" content="http://localhost:4000/images/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="만다린 10 게임" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="이용약관"
+    />
+    <meta
+      name="twitter:description"
+      content="만다린을 선택해서 합이 10이 되도록 하세요!"
+    />
+    <meta
+      name="twitter:image"
+      content="http://localhost:4000/images/og.jpg"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>이용약관</title>
+
+    <!-- (선택) Kakao env & SDK: 필요 시 주석 해제
+  <script src="/env.js"></script>
+  <script>
+    (function() {
+      const KEY = window.__ENV__?.KAKAO_JS_KEY;
+      if(!KEY) return;
+      const s = document.createElement('script');
+      s.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js';
+      s.crossOrigin = 'anonymous';
+      s.onload = () => Kakao.init(KEY);
+      document.head.appendChild(s);
+    })();
+  </script>
+  --></head>
+  <body>
+    <div class="container">
+      <!-- Header / Navbar -->
+<header class="m10-navbar">
+  <div class="m10-nav-inner">
+    <!-- 햄버거 버튼 -->
+    <button
+      class="m10-menu-btn"
+      aria-label="메뉴 열기"
+      aria-expanded="false"
+      aria-controls="m10-menu"
+    >
+      <span class="m10-menu-icon">
+        <span class="m10-bar"></span>
+        <span class="m10-bar"></span>
+        <span class="m10-bar"></span>
+      </span>
+    </button>
+
+    <!-- 가운데 브랜드 -->
+    <a class="m10-brand" href="/">Mandarin10</a>
+
+    <!-- 오른쪽 여백(아이콘 넣을 자리) -->
+    <div class="m10-right-pad"></div>
+  </div>
+
+  <!-- 드롭다운 메뉴 -->
+  <nav id="m10-menu" class="m10-menu" hidden>
+    <a href="/">🏠 홈</a>
+    <a href="/how-to-play/">🎮 게임 방법</a>
+    <a href="/faq/">❓ FAQ</a>
+    <a href="/privacy/">🔒 개인정보</a>
+    <a href="/terms/">📄 약관</a>
+    <a href="/contact/">📧 문의</a>
+  </nav>
+</header>
+
+<style>
+  :root {
+    --m10-maxw: 500px;
+    --m10-primary: #e67e22;
+    --m10-bg: #ffffff;
+    --m10-shadow: 0 2px 14px rgba(0, 0, 0, 0.08);
+    --m10-radius: 14px;
+  }
+
+  /* 상단 바 */
+  .m10-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--m10-bg);
+    box-shadow: var(--m10-shadow);
+  }
+  .m10-nav-inner {
+    max-width: var(--m10-maxw);
+    margin: 0 auto;
+    height: 56px;
+    display: grid;
+    grid-template-columns: 56px 1fr 56px;
+    align-items: center;
+    padding: 0 6px;
+  }
+
+  /* 햄버거 */
+  .m10-menu-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1001;
+    padding: 0;
+  }
+
+  .m10-menu-icon {
+    width: 24px;
+    height: 18px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .m10-bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: #333;
+    border-radius: 1px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+  }
+
+  /* 열림 상태 - 완벽한 X 아이콘 */
+  .m10-menu-btn[aria-expanded="true"] .m10-bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  .m10-menu-btn[aria-expanded="true"] .m10-bar:nth-child(2) {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .m10-menu-btn[aria-expanded="true"] .m10-bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* 브랜드 */
+  .m10-brand {
+    justify-self: center;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    color: #222;
+    text-decoration: none;
+    font-size: 18px;
+    position: relative;
+    z-index: 1001;
+  }
+  .m10-brand::before {
+    content: "🍊";
+    margin-right: 6px;
+    font-size: 18px;
+  }
+  .m10-right-pad {
+    /* 우측 자리 비워둠(검색/프로필 등 확장용) */
+  }
+
+  /* 드롭다운 메뉴 */
+  .m10-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-width: var(--m10-maxw);
+    margin: 8px auto;
+    background: #fff;
+    border-radius: var(--m10-radius);
+    box-shadow: var(--m10-shadow);
+    overflow: hidden;
+    display: grid;
+    padding: 6px;
+    gap: 4px;
+    animation: m10-pop 0.16s ease;
+    z-index: 1000;
+  }
+  .m10-menu a {
+    display: block;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #333;
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.2s ease;
+  }
+  .m10-menu a:hover {
+    background: #fff8f0;
+    color: var(--m10-primary);
+  }
+
+  /* 메뉴가 닫혔을 때 애니메이션 */
+  .m10-menu[hidden] {
+    display: none;
+  }
+
+  @keyframes m10-pop {
+    from {
+      transform: translateY(-6px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .m10-nav-inner {
+      height: 52px;
+    }
+    .m10-brand {
+      font-size: 17px;
+    }
+    .m10-menu a {
+      padding: 11px 12px;
+      font-size: 14.5px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const btn = document.querySelector(".m10-menu-btn");
+    const menu = document.getElementById("m10-menu");
+    const navbar = document.querySelector(".m10-navbar");
+
+    let isMenuOpen = false;
+
+    function openMenu() {
+      menu.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+      isMenuOpen = true;
+    }
+
+    function closeMenu() {
+      menu.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+      isMenuOpen = false;
+    }
+
+    function toggleMenu() {
+      if (isMenuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    // 메뉴 링크 클릭 시 자동 닫기
+    menu.addEventListener("click", (e) => {
+      if (e.target.tagName === "A") {
+        closeMenu();
+      }
+    });
+
+    // 바깥 클릭 시 닫기
+    document.addEventListener("click", (e) => {
+      if (isMenuOpen && !navbar.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    // ESC 키 닫기
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isMenuOpen) {
+        closeMenu();
+      }
+    });
+
+    // 화면 리사이즈 시 메뉴 닫기 (모바일 대응)
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 768 && isMenuOpen) {
+        closeMenu();
+      }
+    });
+  })();
+</script>
+
+
+      <!-- 페이지 본문 -->
+      <h1 id="이용약관">이용약관</h1>
+
+<h2 id="서비스-안내">서비스 안내</h2>
+
+<p>본 사이트는 사용자가 즐길 수 있는 퍼즐 게임(“만다린 10 게임”)을 제공합니다. 서비스 내용은 필요에 따라 변경될 수 있습니다.</p>
+
+<h2 id="이용자의-의무">이용자의 의무</h2>
+
+<ul>
+  <li>관련 법령 및 본 약관을 준수해야 합니다.</li>
+  <li>서비스 운영을 방해하는 행위를 해서는 안 됩니다(예: 비정상적인 자동화 요청, 광고 클릭 유도 행위 등).</li>
+</ul>
+
+<h2 id="지적재산권">지적재산권</h2>
+
+<p>사이트 내 텍스트, 이미지, 코드 등 모든 콘텐츠의 권리는 운영자 또는 해당 권리자에게 있습니다. 무단 복제·배포를 금지합니다.</p>
+
+<h2 id="광고">광고</h2>
+
+<p>본 사이트는 Google AdSense 등을 통해 광고를 노출할 수 있으며, 광고로 이동하는 외부 사이트의 내용 및 정책은 각 제공자의 책임입니다.</p>
+
+<h2 id="책임의-한계">책임의 한계</h2>
+
+<p>서비스는 “있는 그대로” 제공되며, 운영자는 서비스 이용으로 인한 간접·부수적 손해에 대해 책임을 지지 않습니다.</p>
+
+<h2 id="문의">문의</h2>
+
+<p>약관 관련 문의: <a href="mailto:contact@mandarin10.store">contact@mandarin10.store</a></p>
+ <footer
+  style="
+    max-width: 500px;
+    margin: 24px auto 32px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+  "
+>
+  © 2025 Mandarin10. All rights reserved.
+</footer>
+
+    </div>
+
+    <!-- 페이지별 스크립트 -->
+    
+  </body>
+</html>
