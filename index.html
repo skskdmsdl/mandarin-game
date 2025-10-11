@@ -61,54 +61,24 @@
     <title>만다린 10 게임</title>
     <link rel="stylesheet" href="css/style.css" />
 
+    <script src="env.js"></script>
+
     <script>
-      console.log("Dddd", window.__ENV__?.KAKAO_JS_KEY);
-
-      // 카카오 SDK 초기화
-      window.kakaoInit = function () {
-        if (typeof Kakao !== "undefined") {
-          Kakao.init(window.__ENV__?.KAKAO_JS_KEY);
-          console.log("Kakao SDK initialized:", Kakao.isInitialized());
-        }
-      };
-
-      // 카카오 SDK 동적 로드
       (function () {
+        const KAKAO_JS_KEY = window.__ENV__?.KAKAO_JS_KEY;
+        if (!KAKAO_JS_KEY) {
+          console.warn("Kakao JS key is missing. Check env.js / secrets.");
+          return; // 키 없으면 초기화 시도 안 함
+        }
         var script = document.createElement("script");
         script.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js";
-        script.integrity =
-          "sha384-kYPsUbBvlkt74G/57unWLcuuSdUX2sCY3lF3F2VgOTuQEJ0qCEZJ1V2zRGMJ5Q7q";
         script.crossOrigin = "anonymous";
-        script.onload = window.kakaoInit;
+        script.onload = function () {
+          Kakao.init(KAKAO_JS_KEY);
+          console.log("Kakao SDK initialized:", Kakao.isInitialized());
+        };
         document.head.appendChild(script);
       })();
-    </script>
-
-    <!-- 진단용 코드를 head에 추가 -->
-    <script>
-      // 현재 메타태그 상태 확인
-      window.onload = function () {
-        const metaTags = document.querySelectorAll('meta[property^="og:"]');
-        console.log("=== 현재 OG 메타태그 상태 ===");
-        metaTags.forEach((tag) => {
-          console.log(
-            `${tag.getAttribute("property")}: ${tag.getAttribute("content")}`
-          );
-        });
-
-        // 이미지 로드 테스트
-        const testImage = new Image();
-        testImage.onload = function () {
-          console.log("✅ OG 이미지 로드 성공");
-        };
-        testImage.onerror = function () {
-          console.log("❌ OG 이미지 로드 실패");
-        };
-        testImage.src =
-          document
-            .querySelector('meta[property="og:image"]')
-            ?.getAttribute("content") || "";
-      };
     </script>
   </head>
   <body>
