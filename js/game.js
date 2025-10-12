@@ -132,6 +132,10 @@ function handleTouchMove(e) {
 function startDrawing(e) {
   if (!gameStarted || !showNumbers) return;
   isDrawing = true;
+  
+  // 모든 스크롤 방지
+  disableScroll();
+  
   const point = getPoint(e);
   startX = endX = point.x;
   startY = endY = point.y;
