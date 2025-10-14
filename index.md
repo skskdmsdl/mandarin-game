@@ -5,10 +5,6 @@ scripts:
   - /js/game.js
 ---
 
-<!-- <div class="header">
-  <h1>🍊 만다린 10 게임</h1>
-</div> -->
-
 <div class="stats">
   <div class="stat-box"><div class="stat-value" id="score">0</div><div class="stat-label">현재 점수</div></div>
   <div class="stat-box"><div class="stat-value" id="bestScore">0</div><div class="stat-label">최고 점수</div></div>
