@@ -115,10 +115,7 @@ function setupEventListeners() {
 
   restartBtn.addEventListener("click", startGame);
   shareBtn.addEventListener("click", shareScore);
-
-  document
-    .getElementById("startMessageBtn")
-    ?.addEventListener("click", startGame);
+  startMessage.addEventListener("click", startGame);
 }
 
 function handleTouchStart(e) {
