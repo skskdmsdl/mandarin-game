@@ -115,6 +115,10 @@ function setupEventListeners() {
 
   restartBtn.addEventListener("click", startGame);
   shareBtn.addEventListener("click", shareScore);
+
+  document
+    .getElementById("startMessageBtn")
+    ?.addEventListener("click", startGame);
 }
 
 function handleTouchStart(e) {
@@ -132,13 +136,50 @@ function handleTouchMove(e) {
 function startDrawing(e) {
   if (!gameStarted || !showNumbers) return;
   isDrawing = true;
-  
+
   // 모든 스크롤 방지
   disableScroll();
-  
+
   const point = getPoint(e);
-  startX = endX = point.x;
-  startY = endY = point.y;
+  startX = point.x;
+  startY = point.y;
+  endX = point.x;
+  endY = point.y;
+}
+
+// 스크롤 방지 함수
+function disableScroll() {
+  // 현재 스크롤 위치 저장
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+  // 스크롤 고정
+  window.onscroll = function () {
+    window.scrollTo(scrollLeft, scrollTop);
+  };
+
+  // CSS로도 스크롤 방지
+  document.body.style.overflow = "hidden";
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollTop}px`;
+  document.body.style.width = "100%";
+}
+
+// 스크롤 복구 함수
+function enableScroll() {
+  // 스크롤 핸들러 제거
+  window.onscroll = null;
+
+  // CSS 복구
+  const scrollTop = parseInt(document.body.style.top || "0");
+
+  document.body.style.overflow = "";
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.width = "";
+
+  // 스크롤 위치 복원
+  window.scrollTo(0, -scrollTop);
 }
 
 function drawRectangle(e) {
@@ -256,7 +297,7 @@ function endGame() {
   clearInterval(gameTimer);
   gameStarted = false;
   showNumbers = false;
-  showMessage(`최종 점수: ${score}점`, true);
+  showGameOverMessage(`최종 점수: ${score}점`, true);
   restartBtn.textContent = "다시하기";
   startMessage.style.display = "block";
 }
@@ -271,6 +312,7 @@ function restartGame() {
   scoreElement.textContent = score;
   timeLeftElement.textContent = timeLeft;
   startMessage.style.display = "none";
+  message.style.display = "none";
 
   createMandarins();
 
@@ -413,20 +455,31 @@ async function shareScore() {
   }
 }
 
-// 메시지 표시 (게임 종료 시에만 사용)
-function showMessage(text, isGameOver = false) {
+// 게임 종료 메시지 함수 (더 크고 강조된 스타일)
+function showGameOverMessage(text) {
   message.textContent = text;
-  message.className = isGameOver ? "message game-over" : "message";
+  message.className = "message game-over";
   message.style.display = "block";
-  setTimeout(
-    () => {
-      if (message.textContent === text) {
-        message.style.display = "none";
-      }
-    },
-    isGameOver ? 4000 : 1200
-  );
+  message.style.fontSize = "1.6rem";
+  message.style.padding = "25px 35px";
+  message.style.background = "rgba(255, 255, 255, 0.98)";
+  message.style.border = "3px solid #e74c3c";
 }
+
+// 메시지 표시 (게임 종료 시에만 사용)
+// function showMessage(text, isGameOver = false) {
+//   message.textContent = text;
+//   message.className = isGameOver ? "message game-over" : "message";
+//   message.style.display = "block";
+//   setTimeout(
+//     () => {
+//       if (message.textContent === text) {
+//         message.style.display = "none";
+//       }
+//     },
+//     isGameOver ? 4000 : 1200
+//   );
+// }
 
 // 그리기
 function gameLoop() {

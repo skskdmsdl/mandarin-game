@@ -24,7 +24,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 10px 15px;
   margin: 0 auto;
 }
 
@@ -204,6 +204,18 @@ button:active {
   border: 2px solid #e67e22;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   z-index: 5;
+}
+
+#startMessageBtn {
+  background: #e67e22;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 @keyframes popIn {
