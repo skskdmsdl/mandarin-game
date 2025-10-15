@@ -146,37 +146,30 @@ function startDrawing(e) {
 
 // 스크롤 방지 함수
 function disableScroll() {
-  // 현재 스크롤 위치 저장
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-
-  // 스크롤 고정
-  window.onscroll = function () {
-    window.scrollTo(scrollLeft, scrollTop);
-  };
-
-  // CSS로도 스크롤 방지
-  document.body.style.overflow = "hidden";
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollTop}px`;
-  document.body.style.width = "100%";
+  // 캔버스 내에서만 스크롤 방지
+  document.addEventListener("wheel", preventScroll, { passive: false });
+  document.addEventListener("touchmove", preventScroll, { passive: false });
 }
 
 // 스크롤 복구 함수
 function enableScroll() {
-  // 스크롤 핸들러 제거
-  window.onscroll = null;
+  // 스크롤 방지 이벤트 제거
+  document.removeEventListener("wheel", preventScroll);
+  document.removeEventListener("touchmove", preventScroll);
+}
 
-  // CSS 복구
-  const scrollTop = parseInt(document.body.style.top || "0");
+function preventScroll(e) {
+  // 캔버스 영역 내에서 발생한 이벤트만 방지
+  const rect = canvas.getBoundingClientRect();
+  const isInCanvas =
+    e.clientX >= rect.left &&
+    e.clientX <= rect.right &&
+    e.clientY >= rect.top &&
+    e.clientY <= rect.bottom;
 
-  document.body.style.overflow = "";
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.width = "";
-
-  // 스크롤 위치 복원
-  window.scrollTo(0, -scrollTop);
+  if (isInCanvas && isDrawing) {
+    e.preventDefault();
+  }
 }
 
 function drawRectangle(e) {
