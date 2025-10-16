@@ -287,9 +287,8 @@ function endGame() {
   clearInterval(gameTimer);
   gameStarted = false;
   showNumbers = false;
-  showGameOverMessage(`최종 점수: ${score}점`, true);
+  showGameOverMessage(`${score}점`, true);
   restartBtn.textContent = "다시하기";
-  startMessage.style.display = "block";
 }
 
 // 게임 재시작
